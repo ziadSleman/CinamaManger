@@ -1,23 +1,32 @@
+
 public class Ticket {
-    private int seatNumber;
+    public String ID;
+    private String seatNumber;
     private String showtime;
     private double price;
-
+    private String movie;
     // Constructor
-    public Ticket(int seatNumber, String showtime, double price) {
+    public Ticket(String ID, String seatNumber, String showtime, double price,String movie) {
         this.seatNumber = seatNumber;
         this.showtime = showtime;
         this.price = price;
+        this.movie = movie;
+        this.ID = ID;
     }
 
     // Getter and Setter methods
-    public int getSeatNumber() {
+    public String getSeatNumber() {
         return seatNumber;
     }
 
-    public void setSeatNumber(int seatNumber) {
+    public void setSeatNumber(String seatNumber) {
         this.seatNumber = seatNumber;
     }
+    public String getMovie() {
+        return movie;
+    }
+
+
 
     public String getShowtime() {
         return showtime;

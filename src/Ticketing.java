@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Ticketing {
@@ -9,54 +10,75 @@ public class Ticketing {
     }
 
     // عرض المقاعد المتاحة
-    public void displayAvailableSeats(Movie movie, String showtime) {
-        System.out.println("Available seats for movie " + movie.getTitle() + " at showtime " + showtime + ":");
-
-        // يمكنك تحسين هذا الجزء لعرض المقاعد المتاحة بشكل أفضل
-        for (int i = 1; i <= 100; i++) {
-            boolean isSeatBooked = isSeatBooked(movie, showtime, i);
-            if (!isSeatBooked) {
-                System.out.print(i + " ");
-            }
-        }
-        System.out.println();
-    }
+//    public void displayAvailableSeats(Movie movie, String showtime) {
+//        System.out.println("Available seats for movie " + movie.getTitle() + " at showtime " + showtime + ":");
+//        for (int i = 1; i <= 100; i++) {
+//            boolean isSeatBooked = isSeatBooked(movie, showtime, i);
+//            if (!isSeatBooked) {
+//                System.out.print(i + " ");
+//            }
+//        }
+//        System.out.println();
+//    }
 
     // حجز تذكرة
-    public void bookTicket(User user, Movie movie, String showtime, int seatNumber) {
-        if (!isSeatBooked(movie, showtime, seatNumber)) {
-            double ticketPrice = calculateTicketPrice(movie);  // قد تحتاج لدعم طرق دفع مختلفة
-            Ticket bookedTicket = new Ticket(seatNumber, showtime, ticketPrice);
-            bookedTickets.add(bookedTicket);
+    public void bookTicket(String[] info) {
+        if (!isSeatBooked(info[0],info[2],info[3])) {
+          //  double ticketPrice = calculateTicketPrice(movie);
+            Ticket bookedTicket = new Ticket(info[0],info[3],info[2],100.5,info[2]);
+                bookedTickets.add(bookedTicket);
+            try (FileDeal writer = new FileDeal()) {
+                String string = "Movie: " + info[0] + ", Showtime: " + bookedTicket.getShowtime() + ", Seat: " + bookedTicket.getSeatNumber();
+                String previousContent = writer.readFile("\\info\\booking_log.txt");
+                String newContent = (previousContent == null) ? string : previousContent + "\n" + string;
 
-            // يمكنك أيضًا تسجيل التذكرة في ملف نصي أو قاعدة بيانات
-            System.out.println("Ticket booked successfully for " + user.getUsername() +
-                    " - Seat Number: " + seatNumber +
-                    ", Movie: " + movie.getTitle() +
-                    ", Showtime: " + showtime +
-                    ", Price: " + ticketPrice);
-        } else {
-            System.out.println("Seat " + seatNumber + " is already booked. Please choose another seat.");
-        }
-    }
-
-    // إلغاء حجز تذكرة
-    public void cancelTicket(User user, int seatNumber) {
-        for (Ticket bookedTicket : bookedTickets) {
-            if (bookedTicket.getSeatNumber() == seatNumber) {
-                bookedTickets.remove(bookedTicket);
-
-                // يمكنك أيضًا تحديث ملف السجل أو قاعدة البيانات
-                System.out.println("Ticket canceled successfully for " + user.getUsername() +
-                        " - Seat Number: " + seatNumber);
-                return;
+                writer.createFile("\\info", "booking_log.txt", string);
+            } catch (Exception e) {
+               e.printStackTrace();
             }
+        } else {
+            System.out.println("Seat " + info[4] + " is already booked. Please choose another seat.");
         }
-        System.out.println("No booking found for seat " + seatNumber + ". Please check the seat number.");
+
+    }
+    public void cancelTicket(String[] teckt) {
+        try (FileDeal reader = new FileDeal(); FileDeal writer = new FileDeal()) {
+            String content = reader.readFile("\\info\\booking_log.txt");
+            StringBuilder newContent = new StringBuilder();
+            String[] lines = content.split("\n");
+            for (String line : lines) {
+                if (!line.contains("Seat: " + teckt[0])) {
+                    newContent.append(line).append("\n");
+                }
+            }
+
+            writer.createFile("\\info", "booking_log.txt", newContent.toString());
+
+            Iterator<Ticket> iterator = bookedTickets.iterator();
+            while (iterator.hasNext()) {
+                Ticket bookedTicket = iterator.next();
+                if (bookedTicket.getSeatNumber().equals(teckt[4])) {
+                    iterator.remove();
+                    break;
+                }
+            }
+
+            System.out.println("Booking canceled for seat " + teckt[4]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    // تحقق ما إذا كانت التذكرة قد تم حجزها بالفعل
-    private boolean isSeatBooked(Movie movie, String showtime, int seatNumber) {
+    // public void cancelTicket(User user,String seatNumber) {
+ //       for (Ticket bookedTicket : bookedTickets) {
+            //if (bookedTicket.getSeatNumber() == seatNumber) {
+          //      bookedTickets.remove(bookedTicket);
+        //        return;
+      //          ..     }
+     //   }
+   //     System.out.println("No booking found for seat " + seatNumber + ". Please check the seat number.");
+  //  }
+    private boolean isSeatBooked(String movie, String showtime, String seatNumber) {
         for (Ticket bookedTicket : bookedTickets) {
             if (bookedTicket.getSeatNumber() == seatNumber && bookedTicket.getShowtime().equals(showtime)) {
                 return true;
@@ -64,11 +86,8 @@ public class Ticketing {
         }
         return false;
     }
-
-    // احتساب سعر التذكرة (يمكن تعديله وفقًا لمتطلبات المشروع)
     private double calculateTicketPrice(Movie movie) {
-        // قد تحتاج إلى تحسين هذا الجزء وفقًا لسياسات التسعير الخاصة بك
-        return 10.0;  // على سبيل المثال، سعر التذكرة هنا هو 10 دولار
+        return 10.0;
     }
 }
 
