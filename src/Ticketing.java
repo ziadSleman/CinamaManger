@@ -4,9 +4,17 @@ import java.util.List;
 
 public class Ticketing {
     private List<Ticket> bookedTickets;
+    private User user;
+    private Movie movie;
+    private String showTime;
+    private  int seatNumber;
 
-    public Ticketing() {
+    public Ticketing(User user, Movie movie, String showTime, int seatNumber) {
         this.bookedTickets = new ArrayList<>();
+        this.user = user;
+        this.showTime = showTime;
+        this.movie = movie;
+        this.seatNumber = seatNumber;
     }
 
     // عرض المقاعد المتاحة
