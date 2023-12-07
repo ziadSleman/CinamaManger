@@ -8,7 +8,11 @@ public class CancelTicketThread extends Ticketing  implements Runnable{
     }
     @Override
     public void run() {
+<<<<<<< HEAD
       //  cancelTicket(user, seatNumber);
+=======
+        cancelTicket(user, seatNumber);
+>>>>>>> origin/master
 
     }
 }
