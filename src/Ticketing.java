@@ -4,9 +4,17 @@ import java.util.List;
 
 public class Ticketing {
     private List<Ticket> bookedTickets;
+    private User user;
+    private Movie movie;
+    private String showTime;
+    private  int seatNumber;
 
-    public Ticketing() {
+    public Ticketing(User user, Movie movie, String showTime, int seatNumber) {
         this.bookedTickets = new ArrayList<>();
+        this.user = user;
+        this.showTime = showTime;
+        this.movie = movie;
+        this.seatNumber = seatNumber;
     }
 
     // عرض المقاعد المتاحة
@@ -22,13 +30,13 @@ public class Ticketing {
 //    }
 
     // حجز تذكرة
-    public void bookTicket(String[] info) {
-        if (!isSeatBooked(info[0],info[2],info[3])) {
+    public void bookTicket(User user,Movie movie,String showTime,int seatNumber) {
+        if (!isSeatBooked(movie,showTime,seatNumber)) {
           //  double ticketPrice = calculateTicketPrice(movie);
-            Ticket bookedTicket = new Ticket(info[0],info[3],info[2],100.5,info[2]);
+            Ticket bookedTicket = new Ticket(seatNumber,showTime,520,movie);
                 bookedTickets.add(bookedTicket);
             try (FileDeal writer = new FileDeal()) {
-                String string = "Movie: " + info[0] + ", Showtime: " + bookedTicket.getShowtime() + ", Seat: " + bookedTicket.getSeatNumber();
+                String string = "Movie: " + movie + ", Showtime: " + bookedTicket.getShowtime() + ", Seat: " + bookedTicket.getSeatNumber();
                 String previousContent = writer.readFile("\\info\\booking_log.txt");
                 String newContent = (previousContent == null) ? string : previousContent + "\n" + string;
 
@@ -37,48 +45,35 @@ public class Ticketing {
                e.printStackTrace();
             }
         } else {
-            System.out.println("Seat " + info[4] + " is already booked. Please choose another seat.");
+            System.out.println("Seat " + seatNumber + " is already booked. Please choose another seat.");
         }
 
     }
-    public void cancelTicket(String[] teckt) {
-        try (FileDeal reader = new FileDeal(); FileDeal writer = new FileDeal()) {
-            String content = reader.readFile("\\info\\booking_log.txt");
-            StringBuilder newContent = new StringBuilder();
-            String[] lines = content.split("\n");
-            for (String line : lines) {
-                if (!line.contains("Seat: " + teckt[0])) {
-                    newContent.append(line).append("\n");
-                }
+    public void cancelTicket(String[] info) {
+        List<Ticket> newBookedTickets = new ArrayList<>();
+        for (Ticket ticket : bookedTickets) {
+            if (ticket.getID().equals(info[0])) {
+                continue;
             }
+            newBookedTickets.add(ticket);
+        }
+        bookedTickets = newBookedTickets;
 
-            writer.createFile("\\info", "booking_log.txt", newContent.toString());
+        try (FileDeal writer = new FileDeal()) {
+            String string = "Movie: " + bookedTickets+ ", Showtime: " + bookedTickets+ ", Seat: " + bookedTickets;
+            String previousContent = writer.readFile("\\info\\booking_log.txt");
+            String newContent = (previousContent == null) ? string : previousContent + "\n" + string;
 
-            Iterator<Ticket> iterator = bookedTickets.iterator();
-            while (iterator.hasNext()) {
-                Ticket bookedTicket = iterator.next();
-                if (bookedTicket.getSeatNumber().equals(teckt[4])) {
-                    iterator.remove();
-                    break;
-                }
-            }
-
-            System.out.println("Booking canceled for seat " + teckt[4]);
+            writer.createFile("\\info", "booking_log.txt", string);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // public void cancelTicket(User user,String seatNumber) {
- //       for (Ticket bookedTicket : bookedTickets) {
-            //if (bookedTicket.getSeatNumber() == seatNumber) {
-          //      bookedTickets.remove(bookedTicket);
-        //        return;
-      //          ..     }
-     //   }
-   //     System.out.println("No booking found for seat " + seatNumber + ". Please check the seat number.");
-  //  }
-    private boolean isSeatBooked(String movie, String showtime, String seatNumber) {
+
+
+
+    private boolean isSeatBooked(Movie movie, String showtime, int seatNumber) {
         for (Ticket bookedTicket : bookedTickets) {
             if (bookedTicket.getSeatNumber() == seatNumber && bookedTicket.getShowtime().equals(showtime)) {
                 return true;

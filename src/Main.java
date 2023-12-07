@@ -1,5 +1,4 @@
 import java.util.List;
-
 public class Main {
     public static void main(String[] args) {
 
@@ -9,16 +8,12 @@ public class Main {
 
         User user = new User("ziad","12345678","aaaa");
         Movie movie = new Movie(1,"homes","comedy");
-        Ticketing ticketing = new Ticketing();
         //User user, Movie movie, String showtime, String seatNumber
         String time = "20:20";
-        String seatNumber  = "5A";
+        int seatNumber  = 5;
 
-        String[] teckt ={"1",user.getUsername(), movie.getTitle(),time,seatNumber};
-        ticketing.bookTicket(teckt);
-        ticketing.bookTicket(teckt);
+        Ticketing ticketing = new Ticketing(user,movie,time,seatNumber);
 
-        ticketing.cancelTicket(teckt);
 
     }
 }
